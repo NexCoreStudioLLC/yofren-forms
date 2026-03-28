@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Yofren Fleet OS — Razas y Servicios</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0D1117; --bg2:#161B22; --bg3:#1C2330; --surf:#21262D;
+  --gold:#E3A84E; --golddim:rgba(227,168,78,0.13);
+  --blue:#58A6FF; --bluedim:rgba(88,166,255,0.10);
+  --green:#3FB950; --greendim:rgba(63,185,80,0.10);
+  --red:#F85149; --reddim:rgba(248,81,73,0.10);
+  --amber:#F0883E; --amberdim:rgba(240,136,62,0.10);
+  --border:rgba(255,255,255,0.07); --borderact:rgba(88,166,255,0.45);
+  --text:#E6EDF3; --muted:#8B949E; --dim:#484F58;
+  --r:12px; --rsm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px;overflow-x:hidden}
+
+/* TOP */
+.top{position:sticky;top:0;z-index:99;background:var(--bg2);border-bottom:1px solid var(--border)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px}
+.t-left{display:flex;align-items:center;gap:10px}
+.t-logo{width:30px;height:30px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#000;flex-shrink:0}
+.t-name{font-size:13px;font-weight:600;line-height:1.2}
+.t-sub{font-size:10px;color:var(--muted)}
+.t-pill{font-size:12px;font-weight:700;color:var(--gold);background:var(--golddim);padding:5px 12px;border-radius:20px;border:1px solid rgba(227,168,78,0.22)}
+.pbar{height:3px;background:var(--bg3)}
+.pfill{height:100%;background:var(--gold);transition:width .4s ease;border-radius:0 2px 2px 0}
+
+/* SECTION */
+.sec{display:none;padding:22px 16px 8px;animation:fi .25s ease}
+.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--golddim);padding:4px 10px;border-radius:20px;margin-bottom:10px}
+.sec-title{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;line-height:1.15;margin-bottom:6px}
+.sec-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* FIELD */
+.fld{margin-bottom:22px}
+.flabel{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.flabel .req{color:var(--red)}
+.fhint{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 15px;border-radius:22px;border:1px solid var(--border);background:var(--surf);font-size:14px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;-webkit-user-select:none;white-space:nowrap}
+.chip.sel-blue{background:var(--bluedim);border-color:rgba(88,166,255,.4);color:var(--blue);font-weight:500}
+.chip.sel-gold{background:var(--golddim);border-color:rgba(227,168,78,.4);color:var(--gold);font-weight:500}
+.chip.sel-green{background:var(--greendim);border-color:rgba(63,185,80,.4);color:var(--green);font-weight:500}
+.chip.sel-red{background:var(--reddim);border-color:rgba(248,81,73,.4);color:var(--red);font-weight:500}
+.chip.sel-amber{background:var(--amberdim);border-color:rgba(240,136,62,.4);color:var(--amber);font-weight:500}
+
+/* ADD ITEM */
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 13px;outline:none;-webkit-appearance:none}
+.add-row input:focus{border-color:var(--borderact);background:var(--bg3)}
+.add-row input::placeholder{color:var(--dim)}
+.btn-add{flex-shrink:0;padding:0 14px;background:var(--bluedim);border:1px solid rgba(88,166,255,.25);border-radius:var(--rsm);color:var(--blue);font-size:20px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;height:46px}
+.added-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.added-item{display:flex;align-items:center;justify-content:space-between;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:13px;color:var(--text)}
+.added-item button{background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:0 4px}
+
+/* PRICE TABLE */
+.ptable{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.pth{display:grid;gap:1px;padding:10px 14px;background:var(--bg3);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.prow{display:grid;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border);align-items:center}
+.prow:last-child{border-bottom:none}
+.prow-label{font-size:14px;color:var(--text)}
+.prow input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 10px;outline:none;text-align:center;-webkit-appearance:none;width:100%}
+.prow input:focus{border-color:var(--borderact)}
+.prow input::placeholder{color:var(--dim)}
+
+/* 2-col grid table */
+.ptable .pth.g2{grid-template-columns:1fr 80px}
+.ptable .prow.g2{grid-template-columns:1fr 80px}
+.ptable .pth.g3{grid-template-columns:1fr 72px 72px}
+.ptable .prow.g3{grid-template-columns:1fr 72px 72px}
+.ptable .pth.g4{grid-template-columns:120px 1fr 1fr 1fr}
+.ptable .prow.g4{grid-template-columns:120px 1fr 1fr 1fr}
+
+/* TOGGLE CARD */
+.tcard{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.tcard-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tcard-text .tname{font-size:15px;font-weight:500;color:var(--text)}
+.tcard-text .tsub{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:12px;position:relative;cursor:pointer;border:1px solid var(--border);transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--gold);border-color:var(--gold)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(20px)}
+.tcard-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.tcard-body.open{display:block}
+.tcard-body input,.tcard-body select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 12px;outline:none;-webkit-appearance:none;margin-bottom:8px}
+.tcard-body input:focus,.tcard-body select:focus{border-color:var(--borderact)}
+.tcard-body input::placeholder{color:var(--dim)}
+.tcard-body select option{background:var(--bg2)}
+
+/* RADIO CARD */
+.rcard{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .15s}
+.rcard.on{background:var(--bluedim);border-color:rgba(88,166,255,.35)}
+.radio-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--dim);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.rcard.on .radio-circle{border-color:var(--blue);background:var(--blue)}
+.radio-dot{width:8px;height:8px;background:#fff;border-radius:50%;opacity:0;transition:opacity .15s}
+.rcard.on .radio-dot{opacity:1}
+.rcard-text .rtitle{font-size:14px;font-weight:500;color:var(--text)}
+.rcard-text .rsub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+/* SLIDER */
+.slider-wrap{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.slider-label{font-size:13px;color:var(--muted);flex:1}
+.slider-val{font-size:18px;font-weight:700;color:var(--gold);min-width:60px;text-align:right}
+input[type=range]{flex:1;height:4px;accent-color:var(--gold);cursor:pointer;background:transparent}
+
+/* STAR RATING */
+.stars{display:flex;gap:4px}
+.star{font-size:28px;cursor:pointer;color:var(--dim);transition:color .1s,transform .1s;line-height:1}
+.star.on{color:var(--gold)}
+.star:active{transform:scale(1.3)}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:18px 0}
+
+/* TEXTAREA */
+textarea{width:100%;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 13px;outline:none;resize:vertical;min-height:80px;-webkit-appearance:none}
+textarea:focus{border-color:var(--borderact);background:var(--bg3)}
+textarea::placeholder{color:var(--dim)}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;z-index:99}
+.btn-back{flex:0 0 auto;padding:15px 20px;border-radius:var(--r);background:var(--surf);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer}
+.btn-next{flex:1;padding:15px;border-radius:var(--r);background:var(--gold);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.01em}
+.btn-next:active{opacity:.85}
+.btn-back:active{background:var(--bg3)}
+
+/* SUCCESS */
+.success{display:none;padding:60px 20px;text-align:center}
+.success.on{display:block;animation:fi .4s ease}
+.s-icon{width:72px;height:72px;border-radius:50%;background:var(--greendim);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px}
+.s-title{font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:10px}
+.s-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:280px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar">
+    <div class="t-left">
+      <div class="t-logo">Y</div>
+      <div>
+        <div class="t-name">Yofren Fleet OS</div>
+        <div class="t-sub">Razas, Precios y Servicios</div>
+      </div>
+    </div>
+    <div class="t-pill" id="tpill">1 / 8</div>
+  </div>
+  <div class="pbar"><div class="pfill" id="pfill" style="width:12.5%"></div></div>
+</div>
+
+<!-- ========== SEC 1: RAZAS COMUNES ========== -->
+<div class="sec on" id="s1">
+  <div class="sec-badge">Sección 1 de 8</div>
+  <div class="sec-title">Razas que<br>más atienden</div>
+  <div class="sec-desc">Toque las razas más frecuentes en su operación. Si una no aparece, agréguela abajo.</div>
+
+  <div class="fld">
+    <div class="flabel">Razas más comunes <span class="req">*</span></div>
+    <div class="chips" id="ch-comunes">
+      <div class="chip" onclick="tc(this,'blue')">Golden Retriever</div>
+      <div class="chip" onclick="tc(this,'blue')">Golden Doodle Mini</div>
+      <div class="chip" onclick="tc(this,'blue')">Golden Doodle Med</div>
+      <div class="chip" onclick="tc(this,'blue')">Golden Doodle XL</div>
+      <div class="chip" onclick="tc(this,'blue')">Poodle</div>
+      <div class="chip" onclick="tc(this,'blue')">Shih Tzu</div>
+      <div class="chip" onclick="tc(this,'blue')">Maltese</div>
+      <div class="chip" onclick="tc(this,'blue')">Bichon Frise</div>
+      <div class="chip" onclick="tc(this,'blue')">French Bulldog</div>
+      <div class="chip" onclick="tc(this,'blue')">English Bulldog</div>
+      <div class="chip" onclick="tc(this,'blue')">Labrador</div>
+      <div class="chip" onclick="tc(this,'blue')">Yorkie</div>
+      <div class="chip" onclick="tc(this,'blue')">Chihuahua</div>
+      <div class="chip" onclick="tc(this,'blue')">German Shepherd</div>
+      <div class="chip" onclick="tc(this,'blue')">Pomeranian</div>
+      <div class="chip" onclick="tc(this,'blue')">Cocker Spaniel</div>
+      <div class="chip" onclick="tc(this,'blue')">Rottweiler</div>
+      <div class="chip" onclick="tc(this,'blue')">Siberian Husky</div>
+      <div class="chip" onclick="tc(this,'blue')">Dachshund</div>
+      <div class="chip" onclick="tc(this,'blue')">Corgi</div>
+      <div class="chip" onclick="tc(this,'blue')">Pug</div>
+      <div class="chip" onclick="tc(this,'blue')">Schnauzer Mini</div>
+      <div class="chip" onclick="tc(this,'blue')">Schnauzer Std</div>
+      <div class="chip" onclick="tc(this,'blue')">Schnauzer Giant</div>
+      <div class="chip" onclick="tc(this,'blue')">Maltipoo</div>
+      <div class="chip" onclick="tc(this,'blue')">Havanese</div>
+      <div class="chip" onclick="tc(this,'blue')">Beagle</div>
+      <div class="chip" onclick="tc(this,'blue')">Australian Shepherd</div>
+      <div class="chip" onclick="tc(this,'blue')">Cockapoo</div>
+      <div class="chip" onclick="tc(this,'blue')">Cavapoo</div>
+      <div class="chip" onclick="tc(this,'blue')">Bernedoodle</div>
+      <div class="chip" onclick="tc(this,'blue')">Australian Cattle</div>
+      <div class="chip" onclick="tc(this,'blue')">Samoyed</div>
+      <div class="chip" onclick="tc(this,'blue')">Chow Chow</div>
+      <div class="chip" onclick="tc(this,'blue')">Doberman</div>
+      <div class="chip" onclick="tc(this,'blue')">Cane Corso</div>
+      <div class="chip" onclick="tc(this,'blue')">Pit Bull</div>
+      <div class="chip" onclick="tc(this,'blue')">Shiba Inu</div>
+      <div class="chip" onclick="tc(this,'blue')">Boston Terrier</div>
+      <div class="chip" onclick="tc(this,'blue')">Cavalier King Charles</div>
+      <div class="chip" onclick="tc(this,'blue')">Anatolian Shepherd</div>
+      <div class="chip" onclick="tc(this,'blue')">American Bully</div>
+      <div class="chip" onclick="tc(this,'blue')">Gato (doméstico)</div>
+    </div>
+    <div class="add-row">
+      <input type="text" id="add-comun" placeholder="Agregar raza...">
+      <button class="btn-add" onclick="addItem('add-comun','list-comunes',true)">+</button>
+    </div>
+    <div class="added-list" id="list-comunes"></div>
+  </div>
+</div>
+
+<!-- ========== SEC 2: FAVORITAS Y DIFÍCILES ========== -->
+<div class="sec" id="s2">
+  <div class="sec-badge">Sección 2 de 8</div>
+  <div class="sec-title">Favoritas<br>y difíciles</div>
+  <div class="sec-desc">Conocimiento operativo real del equipo de groomers.</div>
+
+  <div class="fld">
+    <div class="flabel">Razas favoritas — más fáciles <span class="req">*</span></div>
+    <div class="chips" id="ch-fav">
+      <div class="chip" onclick="tc(this,'gold')">Golden Doodle</div>
+      <div class="chip" onclick="tc(this,'gold')">Poodle</div>
+      <div class="chip" onclick="tc(this,'gold')">Shih Tzu</div>
+      <div class="chip" onclick="tc(this,'gold')">Maltese</div>
+      <div class="chip" onclick="tc(this,'gold')">Bichon Frise</div>
+      <div class="chip" onclick="tc(this,'gold')">Yorkie</div>
+      <div class="chip" onclick="tc(this,'gold')">Pomeranian</div>
+      <div class="chip" onclick="tc(this,'gold')">Maltipoo</div>
+      <div class="chip" onclick="tc(this,'gold')">Havanese</div>
+      <div class="chip" onclick="tc(this,'gold')">Corgi</div>
+      <div class="chip" onclick="tc(this,'gold')">Cockapoo</div>
+      <div class="chip" onclick="tc(this,'gold')">Cavapoo</div>
+      <div class="chip" onclick="tc(this,'gold')">Cocker Spaniel</div>
+      <div class="chip" onclick="tc(this,'gold')">Golden Retriever</div>
+    </div>
+    <div class="add-row"><input type="text" id="add-fav" placeholder="Agregar..."><button class="btn-add" onclick="addItem('add-fav','list-fav',true)">+</button></div>
+    <div class="added-list" id="list-fav"></div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="fld">
+    <div class="flabel">Razas más difíciles <span class="req">*</span></div>
+    <div class="chips" id="ch-dif">
+      <div class="chip" onclick="tc(this,'red')">Siberian Husky</div>
+      <div class="chip" onclick="tc(this,'red')">Chow Chow</div>
+      <div class="chip" onclick="tc(this,'red')">Rottweiler</div>
+      <div class="chip" onclick="tc(this,'red')">German Shepherd</div>
+      <div class="chip" onclick="tc(this,'red')">Alaskan Malamute</div>
+      <div class="chip" onclick="tc(this,'red')">Bernese Mountain</div>
+      <div class="chip" onclick="tc(this,'red')">Samoyed</div>
+      <div class="chip" onclick="tc(this,'red')">Doberman</div>
+      <div class="chip" onclick="tc(this,'red')">Cane Corso</div>
+      <div class="chip" onclick="tc(this,'red')">Pit Bull</div>
+      <div class="chip" onclick="tc(this,'red')">Anatolian Shepherd</div>
+      <div class="chip" onclick="tc(this,'red')">English Bulldog</div>
+      <div class="chip" onclick="tc(this,'red')">Bernedoodle XL</div>
+    </div>
+    <div class="add-row"><input type="text" id="add-dif" placeholder="Agregar..."><button class="btn-add" onclick="addItem('add-dif','list-dif',true)">+</button></div>
+    <div class="added-list" id="list-dif"></div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Por qué son difíciles? (todo lo que aplique)</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'amber')">Agresividad</div>
+      <div class="chip" onclick="tc(this,'amber')">Pelaje muy denso</div>
+      <div class="chip" onclick="tc(this,'amber')">Tamaño grande</div>
+      <div class="chip" onclick="tc(this,'amber')">Mucho tiempo</div>
+      <div class="chip" onclick="tc(this,'amber')">Ansiedad/miedo</div>
+      <div class="chip" onclick="tc(this,'amber')">Pelaje apelmazado</div>
+      <div class="chip" onclick="tc(this,'amber')">No coopera</div>
+      <div class="chip" onclick="tc(this,'amber')">Doble capa densa</div>
+      <div class="chip" onclick="tc(this,'amber')">Mordida frecuente</div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Razas que prefieren NO aceptar</div>
+    <div class="chips" id="ch-noacept">
+      <div class="chip" onclick="tc(this,'red')">Ninguna — aceptamos todo</div>
+      <div class="chip" onclick="tc(this,'red')">Chow Chow sin historial</div>
+      <div class="chip" onclick="tc(this,'red')">XL agresivos sin muzzle</div>
+      <div class="chip" onclick="tc(this,'red')">Sin vacunas al día</div>
+    </div>
+    <div class="add-row"><input type="text" id="add-noacept" placeholder="Otra restricción..."><button class="btn-add" onclick="addItem('add-noacept','list-noacept',true)">+</button></div>
+    <div class="added-list" id="list-noacept"></div>
+  </div>
+</div>
+
+<!-- ========== SEC 3: PRECIOS POR ZONA ========== -->
+<div class="sec" id="s3">
+  <div class="sec-badge">Sección 3 de 8</div>
+  <div class="sec-title">Precios por<br>zona de servicio</div>
+  <div class="sec-desc">Ingrese los precios reales de Full Grooming y Sanitary por zona. Use el precio que cobran normalmente.</div>
+
+  <div class="fld">
+    <div class="flabel">Miami Dade — Full Grooming / Sanitary</div>
+    <div class="ptable">
+      <div class="pth g3"><div>Tamaño</div><div>Full Grm</div><div>Sanitary</div></div>
+      <div class="prow g3"><div class="prow-label">Small<br><span style="font-size:11px;color:var(--dim)">0–15 lbs</span></div><input placeholder="$85" id="md-f-s"><input placeholder="$70" id="md-sa-s"></div>
+      <div class="prow g3"><div class="prow-label">Medium<br><span style="font-size:11px;color:var(--dim)">16–30 lbs</span></div><input placeholder="$120" id="md-f-m"><input placeholder="$90" id="md-sa-m"></div>
+      <div class="prow g3"><div class="prow-label">Large<br><span style="font-size:11px;color:var(--dim)">31–50 lbs</span></div><input placeholder="$150" id="md-f-l"><input placeholder="$120" id="md-sa-l"></div>
+      <div class="prow g3"><div class="prow-label">XL<br><span style="font-size:11px;color:var(--dim)">51–100 lbs</span></div><input placeholder="$180" id="md-f-xl"><input placeholder="$150" id="md-sa-xl"></div>
+      <div class="prow g3"><div class="prow-label">XXL<br><span style="font-size:11px;color:var(--dim)">100+ lbs</span></div><input placeholder="$220" id="md-f-xxl"><input placeholder="$180" id="md-sa-xxl"></div>
+    </div>
+    <div class="fhint">Deje en blanco si el precio del placeholder es correcto.</div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Broward (+ arriba de Pompano +$10)</div>
+    <div class="ptable">
+      <div class="pth g3"><div>Tamaño</div><div>Full Grm</div><div>Sanitary</div></div>
+      <div class="prow g3"><div class="prow-label">Small</div><input placeholder="$95" id="bw-f-s"><input placeholder="$80" id="bw-sa-s"></div>
+      <div class="prow g3"><div class="prow-label">Medium</div><input placeholder="$130" id="bw-f-m"><input placeholder="$100" id="bw-sa-m"></div>
+      <div class="prow g3"><div class="prow-label">Large</div><input placeholder="$160" id="bw-f-l"><input placeholder="$130" id="bw-sa-l"></div>
+      <div class="prow g3"><div class="prow-label">XL</div><input placeholder="$190" id="bw-f-xl"><input placeholder="$160" id="bw-sa-xl"></div>
+      <div class="prow g3"><div class="prow-label">XXL</div><input placeholder="$230" id="bw-f-xxl"><input placeholder="$190" id="bw-sa-xxl"></div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Naples</div>
+    <div class="ptable">
+      <div class="pth g3"><div>Tamaño</div><div>Full Grm</div><div>Sanitary</div></div>
+      <div class="prow g3"><div class="prow-label">Small</div><input placeholder="$100" id="np-f-s"><input placeholder="$75" id="np-sa-s"></div>
+      <div class="prow g3"><div class="prow-label">Medium</div><input placeholder="$140" id="np-f-m"><input placeholder="$95" id="np-sa-m"></div>
+      <div class="prow g3"><div class="prow-label">Large</div><input placeholder="$175" id="np-f-l"><input placeholder="$135" id="np-sa-l"></div>
+      <div class="prow g3"><div class="prow-label">XL</div><input placeholder="$200" id="np-f-xl"><input placeholder="$150" id="np-sa-xl"></div>
+      <div class="prow g3"><div class="prow-label">XXL</div><input placeholder="$250" id="np-f-xxl"><input placeholder="$180" id="np-sa-xxl"></div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Miami Beach (recargo adicional)</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'blue')" id="mb-10">+$10 sobre Miami Dade</div>
+      <div class="chip" onclick="tc(this,'blue')" id="mb-15">+$15 sobre Miami Dade</div>
+      <div class="chip" onclick="tc(this,'blue')" id="mb-otro">Precio distinto</div>
+    </div>
+    <div class="add-row" style="margin-top:10px"><input type="text" id="mb-detalle" placeholder="Detallar si seleccionó 'Precio distinto'..."></div>
+  </div>
+</div>
+
+<!-- ========== SEC 4: PRECIOS POR RAZA ESPECÍFICA ========== -->
+<div class="sec" id="s4">
+  <div class="sec-badge">Sección 4 de 8</div>
+  <div class="sec-title">Precios por<br>raza específica</div>
+  <div class="sec-desc">Algunas razas tienen precio fijo sin importar el tamaño general. Llene solo las que apliquen.</div>
+
+  <div class="fld">
+    <div class="flabel">¿Tienen precios fijos por raza?</div>
+    <div class="rcard on" id="rc-si" onclick="selectR(this,'praz')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Sí — algunas razas tienen precio propio</div><div class="rsub">Como los Golden Doodle por tamaño de raza</div></div>
+    </div>
+    <div class="rcard" id="rc-no" onclick="selectR(this,'praz')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">No — siempre usamos precio por tamaño</div></div>
+    </div>
+  </div>
+
+  <div id="tabla-razas-fijas">
+    <div class="fld">
+      <div class="flabel">Razas con precio fijo — Full Grooming Miami Dade</div>
+      <div class="ptable" id="raza-price-table">
+        <div class="pth g3"><div>Raza</div><div>Full Grm</div><div>Sanitary</div></div>
+        <div class="prow g3"><div class="prow-label">Golden Doodle Mini<br><span style="font-size:10px;color:var(--dim)">&lt;15 lbs</span></div><input placeholder="$85–95" id="gd-mini-f"><input placeholder="$75" id="gd-mini-s"></div>
+        <div class="prow g3"><div class="prow-label">Golden Doodle Med<br><span style="font-size:10px;color:var(--dim)">16–25 lbs</span></div><input placeholder="$95–120" id="gd-med-f"><input placeholder="$80–90" id="gd-med-s"></div>
+        <div class="prow g3"><div class="prow-label">Golden Doodle Std<br><span style="font-size:10px;color:var(--dim)">26–45 lbs</span></div><input placeholder="$125–150" id="gd-std-f"><input placeholder="$100–120" id="gd-std-s"></div>
+        <div class="prow g3"><div class="prow-label">Golden Doodle L<br><span style="font-size:10px;color:var(--dim)">46–65 lbs</span></div><input placeholder="$150–180" id="gd-l-f"><input placeholder="$130–150" id="gd-l-s"></div>
+        <div class="prow g3"><div class="prow-label">Golden Doodle XL<br><span style="font-size:10px;color:var(--dim)">70+ lbs</span></div><input placeholder="$180–220" id="gd-xl-f"><input placeholder="$150–180" id="gd-xl-s"></div>
+        <div class="prow g3"><div class="prow-label">Schnauzer Mini</div><input placeholder="$85" id="sch-mini-f"><input placeholder="$70" id="sch-mini-s"></div>
+        <div class="prow g3"><div class="prow-label">Schnauzer Std</div><input placeholder="$95" id="sch-std-f"><input placeholder="$80" id="sch-std-s"></div>
+        <div class="prow g3"><div class="prow-label">Schnauzer Giant</div><input placeholder="$135–150" id="sch-g-f"><input placeholder="$100" id="sch-g-s"></div>
+        <div class="prow g3"><div class="prow-label">Bernedoodle</div><input placeholder="$125–156" id="bern-f"><input placeholder="" id="bern-s"></div>
+      </div>
+      <div class="add-row" style="margin-top:10px">
+        <input type="text" id="add-raza-p" placeholder="Raza — precio full — precio sanitary">
+        <button class="btn-add" onclick="addItem('add-raza-p','list-razap')">+</button>
+      </div>
+      <div class="added-list" id="list-razap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SEC 5: MODIFICADORES ========== -->
+<div class="sec" id="s5">
+  <div class="sec-badge">Sección 5 de 8</div>
+  <div class="sec-title">Modificadores<br>de precio</div>
+  <div class="sec-desc">Active los cargos adicionales que aplican y seleccione el monto.</div>
+
+  <!-- Dematting -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">Pelaje apelmazado / Bad condition</div><div class="tsub">Dematting fee</div></div>
+      <div class="toggle on" id="tog-dm" onclick="togCard(this,'body-dm')"></div>
+    </div>
+    <div class="tcard-body open" id="body-dm">
+      <div class="flabel" style="margin-bottom:8px">Cargo</div>
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip" onclick="tc(this,'gold')">$20</div>
+        <div class="chip sel-gold" onclick="tc(this,'gold')">$30</div>
+        <div class="chip" onclick="tc(this,'gold')">$40</div>
+        <div class="chip" onclick="tc(this,'gold')">$50</div>
+        <div class="chip" onclick="tc(this,'gold')">$30–$80</div>
+        <div class="chip" onclick="tc(this,'gold')">Varía</div>
+      </div>
+      <input placeholder="Nota adicional (opcional)..." id="nota-dm">
+    </div>
+  </div>
+
+  <!-- Agresivo -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">Comportamiento agresivo</div><div class="tsub">Aggressive fee</div></div>
+      <div class="toggle on" id="tog-ag" onclick="togCard(this,'body-ag')"></div>
+    </div>
+    <div class="tcard-body open" id="body-ag">
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip" onclick="tc(this,'gold')">$20</div>
+        <div class="chip" onclick="tc(this,'gold')">$30</div>
+        <div class="chip sel-gold" onclick="tc(this,'gold')">$40</div>
+        <div class="chip" onclick="tc(this,'gold')">$50</div>
+        <div class="chip" onclick="tc(this,'gold')">Varía</div>
+      </div>
+      <input placeholder="¿Cuándo aplica exactamente?" id="nota-ag">
+    </div>
+  </div>
+
+  <!-- De-shedding -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">De-shedding / Doble capa</div><div class="tsub">Pelaje muy denso</div></div>
+      <div class="toggle" id="tog-ds" onclick="togCard(this,'body-ds')"></div>
+    </div>
+    <div class="tcard-body" id="body-ds">
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip" onclick="tc(this,'gold')">$20</div>
+        <div class="chip" onclick="tc(this,'gold')">$25</div>
+        <div class="chip" onclick="tc(this,'gold')">$30</div>
+        <div class="chip" onclick="tc(this,'gold')">Varía</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Groomer preferido -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">Groomer preferido</div><div class="tsub">Preferred groomer reservation</div></div>
+      <div class="toggle on" id="tog-gp" onclick="togCard(this,'body-gp')"></div>
+    </div>
+    <div class="tcard-body open" id="body-gp">
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip sel-gold" onclick="tc(this,'gold')">$20</div>
+        <div class="chip" onclick="tc(this,'gold')">$25</div>
+        <div class="chip" onclick="tc(this,'gold')">No cobran</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parking -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">Parking fee</div><div class="tsub">Cuando aplica en zonas específicas</div></div>
+      <div class="toggle on" id="tog-pk" onclick="togCard(this,'body-pk')"></div>
+    </div>
+    <div class="tcard-body open" id="body-pk">
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip sel-gold" onclick="tc(this,'gold')">$3</div>
+        <div class="chip" onclick="tc(this,'gold')">$5</div>
+        <div class="chip" onclick="tc(this,'gold')">Varía</div>
+      </div>
+      <input placeholder="¿Dónde suele aplicar? (edificios, zonas...)" id="nota-pk">
+    </div>
+  </div>
+
+  <!-- No-show -->
+  <div class="tcard">
+    <div class="tcard-top">
+      <div class="tcard-text"><div class="tname">No-show / Cancelación tardía</div><div class="tsub">Cancellation fee</div></div>
+      <div class="toggle on" id="tog-ns" onclick="togCard(this,'body-ns')"></div>
+    </div>
+    <div class="tcard-body open" id="body-ns">
+      <div class="chips" style="margin-bottom:8px">
+        <div class="chip sel-gold" onclick="tc(this,'gold')">$25</div>
+        <div class="chip" onclick="tc(this,'gold')">$30</div>
+        <div class="chip" onclick="tc(this,'gold')">50% del servicio</div>
+        <div class="chip" onclick="tc(this,'gold')">Varía</div>
+      </div>
+      <input placeholder="¿Con cuánto tiempo de anticipación es cancelación tardía?" id="nota-ns">
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Algún otro modificador que no está aquí?</div>
+    <div class="add-row"><input type="text" id="add-mod" placeholder="Ej: cargos por distancia, horario tardío..."><button class="btn-add" onclick="addItem('add-mod','list-mod')">+</button></div>
+    <div class="added-list" id="list-mod"></div>
+  </div>
+</div>
+
+<!-- ========== SEC 6: TIEMPOS Y CAPACIDAD ========== -->
+<div class="sec" id="s6">
+  <div class="sec-badge">Sección 6 de 8</div>
+  <div class="sec-title">Tiempos y<br>capacidad</div>
+  <div class="sec-desc">Cuánto tarda cada servicio y cuánto puede hacer una van en un día.</div>
+
+  <div class="fld">
+    <div class="flabel">Tiempo promedio Full Grooming por tamaño</div>
+    <div class="ptable">
+      <div class="pth g2"><div>Tamaño</div><div>Minutos</div></div>
+      <div class="prow g2"><div class="prow-label">Small (0–15 lbs)</div><input placeholder="60" id="t-s"></div>
+      <div class="prow g2"><div class="prow-label">Medium (16–30 lbs)</div><input placeholder="60" id="t-m"></div>
+      <div class="prow g2"><div class="prow-label">Large (31–50 lbs)</div><input placeholder="80" id="t-l"></div>
+      <div class="prow g2"><div class="prow-label">XL (51–100 lbs)</div><input placeholder="100" id="t-xl"></div>
+      <div class="prow g2"><div class="prow-label">XXL (100+ lbs)</div><input placeholder="140" id="t-xxl"></div>
+    </div>
+    <div class="fhint">Deje en blanco si el tiempo del placeholder es correcto.</div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Citas por van en un día normal</div>
+    <div class="slider-wrap">
+      <div class="slider-row">
+        <div class="slider-label">Citas completas / día</div>
+        <div class="slider-val" id="sv-citas">6</div>
+      </div>
+      <input type="range" min="2" max="12" value="6" oninput="document.getElementById('sv-citas').textContent=this.value" id="sl-citas">
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Tiempo promedio de desplazamiento entre citas</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'blue')">10–15 min</div>
+      <div class="chip sel-blue" onclick="tc(this,'blue')">15–25 min</div>
+      <div class="chip" onclick="tc(this,'blue')">25–40 min</div>
+      <div class="chip" onclick="tc(this,'blue')">Varía mucho</div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Razas que siempre toman más tiempo del normal</div>
+    <div class="chips" id="ch-tiempo">
+      <div class="chip" onclick="tc(this,'amber')">Siberian Husky</div>
+      <div class="chip" onclick="tc(this,'amber')">Chow Chow</div>
+      <div class="chip" onclick="tc(this,'amber')">Samoyed</div>
+      <div class="chip" onclick="tc(this,'amber')">Bernese Mountain</div>
+      <div class="chip" onclick="tc(this,'amber')">Alaskan Malamute</div>
+      <div class="chip" onclick="tc(this,'amber')">Golden Doodle XL</div>
+      <div class="chip" onclick="tc(this,'amber')">Bernedoodle</div>
+      <div class="chip" onclick="tc(this,'amber')">Pekingese</div>
+    </div>
+    <div class="add-row"><input type="text" id="add-t" placeholder="Agregar raza..."><button class="btn-add" onclick="addItem('add-t','list-t',true)">+</button></div>
+    <div class="added-list" id="list-t"></div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Hacen servicio de Dental Cleaning con frecuencia?</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'blue')">Sí — servicio regular</div>
+      <div class="chip sel-blue" onclick="tc(this,'blue')">Ocasionalmente</div>
+      <div class="chip" onclick="tc(this,'blue')">Rara vez</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SEC 7: ADD-ONS ========== -->
+<div class="sec" id="s7">
+  <div class="sec-badge">Sección 7 de 8</div>
+  <div class="sec-title">Add-ons y<br>servicios especiales</div>
+  <div class="sec-desc">Confirme los servicios adicionales activos. Los marcados en verde están en su catálogo actual.</div>
+
+  <div class="fld">
+    <div class="flabel">Add-ons activos <span class="req">*</span></div>
+    <div class="chips">
+      <div class="chip sel-green" onclick="tc(this,'green')">Teeth Brushing $5</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Clipping Nails $25</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Nail Polish $20</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Anal Gland $10</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">De-shedding $20</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Dematting $30</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Hair Mask $30</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Trimming $20</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Paws Service $20</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Bravecto $75</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Coloring $100</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Flea Shampoo $45</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Oatmeal Shampoo $25</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Medicated Shampoo $25</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Shampoo Bottle $25</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Ear Flush+Med $130</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Otomax $90</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Antibiótico Zydaclin $50</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Bad Condition $30</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Cat Full Grm $160</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Cat Bath $130</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Dental Cleaning S $220</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Dental Cleaning M $250</div>
+      <div class="chip sel-green" onclick="tc(this,'green')">Dental Cleaning L $300</div>
+    </div>
+    <div class="fhint">Desmarque los que ya no ofrecen. Agregue los que falten.</div>
+    <div class="add-row" style="margin-top:10px"><input type="text" id="add-ao" placeholder="Nuevo add-on — precio: ej. Spa $45"><button class="btn-add" onclick="addItem('add-ao','list-ao')">+</button></div>
+    <div class="added-list" id="list-ao"></div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Qué tan seguido piden add-ons los clientes?</div>
+    <div class="rcard on" id="rc-ao1" onclick="selectR(this,'aofreq')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Casi siempre — la mayoría los pide</div></div>
+    </div>
+    <div class="rcard" id="rc-ao2" onclick="selectR(this,'aofreq')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">A veces — depende del cliente</div></div>
+    </div>
+    <div class="rcard" id="rc-ao3" onclick="selectR(this,'aofreq')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Rara vez</div></div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Add-on que más piden</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'gold')">Nail Trim</div>
+      <div class="chip" onclick="tc(this,'gold')">Teeth Brushing</div>
+      <div class="chip" onclick="tc(this,'gold')">De-shedding</div>
+      <div class="chip" onclick="tc(this,'gold')">Flea Shampoo</div>
+      <div class="chip" onclick="tc(this,'gold')">Bravecto</div>
+      <div class="chip" onclick="tc(this,'gold')">Anal Gland</div>
+      <div class="chip" onclick="tc(this,'gold')">Hair Mask</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SEC 8: CONOCIMIENTO OPERATIVO ========== -->
+<div class="sec" id="s8">
+  <div class="sec-badge">Sección 8 de 8</div>
+  <div class="sec-title">Conocimiento<br>del negocio</div>
+  <div class="sec-desc">Lo que los datos no dicen — la experiencia real de años en este negocio.</div>
+
+  <div class="fld">
+    <div class="flabel">Servicio más rentable <span class="req">*</span></div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'gold')">Full Grooming</div>
+      <div class="chip" onclick="tc(this,'gold')">Sanitary</div>
+      <div class="chip" onclick="tc(this,'gold')">Dental Cleaning</div>
+      <div class="chip" onclick="tc(this,'gold')">Cat Grooming</div>
+      <div class="chip" onclick="tc(this,'gold')">Add-ons combinados</div>
+      <div class="chip" onclick="tc(this,'gold')">Full + Add-ons</div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Razas más rentables para el negocio <span class="req">*</span></div>
+    <div class="chips" id="ch-rentable">
+      <div class="chip" onclick="tc(this,'gold')">Golden Doodle</div>
+      <div class="chip" onclick="tc(this,'gold')">Golden Retriever</div>
+      <div class="chip" onclick="tc(this,'gold')">Poodle</div>
+      <div class="chip" onclick="tc(this,'gold')">Bernedoodle</div>
+      <div class="chip" onclick="tc(this,'gold')">Bernese Mountain</div>
+      <div class="chip" onclick="tc(this,'gold')">Samoyed</div>
+      <div class="chip" onclick="tc(this,'gold')">Husky</div>
+      <div class="chip" onclick="tc(this,'gold')">Cocker Spaniel</div>
+    </div>
+    <div class="add-row"><input type="text" id="add-rent" placeholder="Agregar raza..."><button class="btn-add" onclick="addItem('add-rent','list-rent',true)">+</button></div>
+    <div class="added-list" id="list-rent"></div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Cómo determinan el precio cuando hay duda?</div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'blue')">Por peso declarado</div>
+      <div class="chip" onclick="tc(this,'blue')">Por foto previa</div>
+      <div class="chip" onclick="tc(this,'blue')">El groomer decide en sitio</div>
+      <div class="chip" onclick="tc(this,'blue')">Llaman al cliente y acuerdan</div>
+      <div class="chip" onclick="tc(this,'blue')">Precio base + ajuste post-servicio</div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Han subido precios recientemente?</div>
+    <div class="rcard on" id="rc-sp1" onclick="selectR(this,'subida')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Sí — en los últimos 6 meses</div></div>
+    </div>
+    <div class="rcard" id="rc-sp2" onclick="selectR(this,'subida')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">No — los precios están igual</div></div>
+    </div>
+    <div class="rcard" id="rc-sp3" onclick="selectR(this,'subida')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Planeamos subirlos pronto</div></div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Tienen clientes con precio especial o acuerdo particular?</div>
+    <div class="rcard on" id="rc-ep1" onclick="selectR(this,'espcliente')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">Sí — algunos clientes tienen precio acordado</div></div>
+    </div>
+    <div class="rcard" id="rc-ep2" onclick="selectR(this,'espcliente')">
+      <div class="radio-circle"><div class="radio-dot"></div></div>
+      <div class="rcard-text"><div class="rtitle">No — todos pagan precio estándar</div></div>
+    </div>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">Algo más que deba saber NexCore (precios, razas, excepciones)</div>
+    <textarea id="notas-finales" placeholder="Cualquier detalle operativo, excepción de precio, acuerdo especial, política interna que no esté cubierta arriba..."></textarea>
+  </div>
+
+  <div class="fld">
+    <div class="flabel">¿Quién completó este formulario? <span class="req">*</span></div>
+    <div class="chips">
+      <div class="chip" onclick="tc(this,'blue')">Jennifer Dominguez</div>
+      <div class="chip" onclick="tc(this,'blue')">Yofren Dominguez</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success" id="success">
+  <div class="s-icon">✓</div>
+  <div class="s-title">¡Enviado!</div>
+  <div class="s-sub">La información fue enviada al equipo de NexCore Studio. Muchas gracias.</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav">
+  <button class="btn-back" id="bbk" onclick="prev()" style="display:none">← Atrás</button>
+  <button class="btn-next" id="bnx" onclick="next()">Siguiente →</button>
+</div>
+
+<script>
+const TOTAL=8; let cur=1;
+
+// Toggle chip
+function tc(el,color){
+  const cls='sel-'+color;
+  const others=['sel-blue','sel-gold','sel-green','sel-red','sel-amber'].filter(c=>c!==cls);
+  if(el.classList.contains(cls)){el.classList.remove(cls)}
+  else{others.forEach(c=>el.classList.remove(c));el.classList.add(cls)}
+}
+
+// Add item to list
+function addItem(inputId,listId,asChip){
+  const inp=document.getElementById(inputId);
+  const val=inp.value.trim();
+  if(!val)return;
+  const list=document.getElementById(listId);
+  if(asChip){
+    // add as chip to nearest chips container
+    const sec=inp.closest('.sec')||inp.closest('.fld');
+    // find chips wrap by looking for chips in same fld
+    const fld=inp.closest('.fld');
+    const chipsWrap=fld?fld.querySelector('.chips'):null;
+    if(chipsWrap){
+      const chip=document.createElement('div');
+      chip.className='chip sel-blue';
+      chip.textContent=val;
+      chip.onclick=function(){tc(this,'blue')};
+      chipsWrap.appendChild(chip);
+      inp.value='';return;
+    }
+  }
+  const item=document.createElement('div');
+  item.className='added-item';
+  item.innerHTML=`<span>${val}</span><button onclick="this.parentElement.remove()">×</button>`;
+  list.appendChild(item);
+  inp.value='';
+}
+
+// Radio select
+const rgroups={};
+function selectR(el,group){
+  if(!rgroups[group]){rgroups[group]=el.parentElement.querySelectorAll('.rcard')}
+  rgroups[group].forEach(r=>r.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// Toggle card
+function togCard(tog,bodyId){
+  tog.classList.toggle('on');
+  const body=document.getElementById(bodyId);
+  body.classList.toggle('open');
+}
+
+// Nav
+function next(){
+  if(cur<TOTAL){
+    document.getElementById('s'+cur).classList.remove('on');
+    cur++;
+    document.getElementById('s'+cur).classList.add('on');
+    upd();window.scrollTo(0,0);
+  } else { submit(); }
+}
+function prev(){
+  if(cur>1){
+    document.getElementById('s'+cur).classList.remove('on');
+    cur--;
+    document.getElementById('s'+cur).classList.add('on');
+    upd();window.scrollTo(0,0);
+  }
+}
+function upd(){
+  document.getElementById('tpill').textContent=cur+' / '+TOTAL;
+  document.getElementById('pfill').style.width=(cur/TOTAL*100)+'%';
+  document.getElementById('bbk').style.display=cur>1?'block':'none';
+  document.getElementById('bnx').textContent=cur===TOTAL?'Enviar ✓':'Siguiente →';
+}
+
+// Collect + format
+function collect(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+  const chips=id=>{const e=document.getElementById(id);return e?[...e.querySelectorAll('.sel-blue,.sel-gold,.sel-green,.sel-red,.sel-amber')].map(c=>c.textContent):[]};
+  const selChips=selector=>[...document.querySelectorAll(selector)].map(c=>c.textContent);
+  const addedItems=id=>{const e=document.getElementById(id);return e?[...e.querySelectorAll('.added-item span')].map(s=>s.textContent):[]};
+
+  return {
+    razas_comunes:[...chips('ch-comunes'),...addedItems('list-comunes')],
+    razas_favoritas:[...chips('ch-fav'),...addedItems('list-fav')],
+    razas_dificiles:[...chips('ch-dif'),...addedItems('list-dif')],
+    razas_no_acepta:[...chips('ch-noacept'),...addedItems('list-noacept')],
+    precios_miami:{
+      small_full:g('md-f-s')||'$85',small_san:g('md-sa-s')||'$70',
+      med_full:g('md-f-m')||'$120',med_san:g('md-sa-m')||'$90',
+      large_full:g('md-f-l')||'$150',large_san:g('md-sa-l')||'$120',
+      xl_full:g('md-f-xl')||'$180',xl_san:g('md-sa-xl')||'$150',
+      xxl_full:g('md-f-xxl')||'$220',xxl_san:g('md-sa-xxl')||'$180',
+    },
+    precios_broward:{
+      small_full:g('bw-f-s'),med_full:g('bw-f-m'),large_full:g('bw-f-l'),xl_full:g('bw-f-xl'),xxl_full:g('bw-f-xxl'),
+      small_san:g('bw-sa-s'),med_san:g('bw-sa-m'),large_san:g('bw-sa-l'),xl_san:g('bw-sa-xl'),xxl_san:g('bw-sa-xxl'),
+    },
+    precios_naples:{
+      small_full:g('np-f-s'),med_full:g('np-f-m'),large_full:g('np-f-l'),xl_full:g('np-f-xl'),xxl_full:g('np-f-xxl'),
+      small_san:g('np-sa-s'),med_san:g('np-sa-m'),large_san:g('np-sa-l'),xl_san:g('np-sa-xl'),xxl_san:g('np-sa-xxl'),
+    },
+    razas_precio_fijo:{
+      gd_mini:g('gd-mini-f'),gd_med:g('gd-med-f'),gd_std:g('gd-std-f'),gd_l:g('gd-l-f'),gd_xl:g('gd-xl-f'),
+      sch_mini:g('sch-mini-f'),sch_std:g('sch-std-f'),sch_g:g('sch-g-f'),bernedoodle:g('bern-f'),
+      extras:addedItems('list-razap')
+    },
+    addons:[...document.querySelectorAll('#s7 .chips .sel-green').length?document.querySelectorAll('#s7 .chips .sel-green'):[]]
+      .map(c=>c.textContent),
+    tiempos:{s:g('t-s')||'60',m:g('t-m')||'60',l:g('t-l')||'80',xl:g('t-xl')||'100',xxl:g('t-xxl')||'140'},
+    citas_dia:document.getElementById('sl-citas').value,
+    razas_tiempo_extra:[...chips('ch-tiempo'),...addedItems('list-t')],
+    notas:g('notas-finales'),
+    quien:[...document.querySelectorAll('#s8 .chips .sel-blue')].map(c=>c.textContent).join(', '),
+    ts:new Date().toLocaleString('es-US',{timeZone:'America/New_York'})
+  };
+}
+
+function fmt(d){
+  const j=a=>a&&a.length?a.join(', '):'—';
+  const v=x=>x||'—';
+  let m=`🐾 *RAZAS, PRECIOS Y SERVICIOS*\n📅 ${d.ts}\n👤 ${v(d.quien)}\n\n`;
+  m+=`━━━ RAZAS COMUNES ━━━\n${j(d.razas_comunes)}\n\n`;
+  m+=`━━━ FAVORITAS ━━━\n${j(d.razas_favoritas)}\n\n`;
+  m+=`━━━ DIFÍCILES ━━━\n${j(d.razas_dificiles)}\n\n`;
+  if(d.razas_no_acepta.length){m+=`━━━ NO ACEPTAN ━━━\n${j(d.razas_no_acepta)}\n\n`}
+  const p=d.precios_miami;
+  m+=`━━━ MIAMI DADE ━━━\nSmall: Full ${p.small_full} / San ${p.small_san}\nMedium: Full ${p.med_full} / San ${p.med_san}\nLarge: Full ${p.large_full} / San ${p.large_san}\nXL: Full ${p.xl_full} / San ${p.xl_san}\nXXL: Full ${p.xxl_full} / San ${p.xxl_san}\n\n`;
+  const b=d.precios_broward;
+  if(b.small_full||b.med_full){m+=`━━━ BROWARD ━━━\n`;
+    if(b.small_full)m+=`Small: ${b.small_full}/${b.small_san}\n`;
+    if(b.med_full)m+=`Med: ${b.med_full}/${b.med_san}\n`;
+    if(b.large_full)m+=`Large: ${b.large_full}/${b.large_san}\n`;
+    if(b.xl_full)m+=`XL: ${b.xl_full}/${b.xl_san}\n`;m+='\n';}
+  const n=d.precios_naples;
+  if(n.small_full||n.med_full){m+=`━━━ NAPLES ━━━\n`;
+    if(n.small_full)m+=`Small: ${n.small_full}/${n.small_san}\n`;
+    if(n.med_full)m+=`Med: ${n.med_full}/${n.med_san}\n`;
+    if(n.large_full)m+=`Large: ${n.large_full}/${n.large_san}\n`;m+='\n';}
+  const r=d.razas_precio_fijo;
+  m+=`━━━ PRECIOS POR RAZA ━━━\n`;
+  if(r.gd_mini)m+=`GD Mini: ${r.gd_mini}\n`;
+  if(r.gd_med)m+=`GD Med: ${r.gd_med}\n`;
+  if(r.gd_std)m+=`GD Std: ${r.gd_std}\n`;
+  if(r.gd_l)m+=`GD L: ${r.gd_l}\n`;
+  if(r.gd_xl)m+=`GD XL: ${r.gd_xl}\n`;
+  if(r.sch_mini)m+=`Schnauzer Mini: ${r.sch_mini}\n`;
+  if(r.sch_std)m+=`Schnauzer Std: ${r.sch_std}\n`;
+  if(r.sch_g)m+=`Schnauzer Giant: ${r.sch_g}\n`;
+  if(r.bernedoodle)m+=`Bernedoodle: ${r.bernedoodle}\n`;
+  if(r.extras.length)m+=r.extras.join('\n')+'\n';
+  m+=`\n━━━ TIEMPOS ━━━\nSmall: ${d.tiempos.s}min | Med: ${d.tiempos.m}min | Large: ${d.tiempos.l}min | XL: ${d.tiempos.xl}min | XXL: ${d.tiempos.xxl}min\nCitas/van/día: ${d.citas_dia}\n`;
+  if(d.razas_tiempo_extra.length)m+=`Tiempo extra: ${j(d.razas_tiempo_extra)}\n`;
+  m+=`\n━━━ ADD-ONS ACTIVOS ━━━\n${j(d.addons)}\n`;
+  if(d.notas)m+=`\n━━━ NOTAS ━━━\n${d.notas}\n`;
+  return encodeURIComponent(m);
+}
+
+function submit(){
+  const data=collect();
+  const msg=fmt(data);
+  document.getElementById('bnav').style.display='none';
+  document.getElementById('s'+cur).classList.remove('on');
+  document.getElementById('success').classList.add('on');
+  document.querySelector('.pbar').style.display='none';
+  setTimeout(()=>{window.open(`https://wa.me/12397448884?text=${msg}`,'_blank')},500);
+}
+upd();
+</script>
+</body>
+</html>
