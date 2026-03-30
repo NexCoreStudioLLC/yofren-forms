@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yofren Master Pet Grooming — Una Nueva Era</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;
+  --gold2:#E8C87A;
+  --green:#6ABF1E;
+  --green-dark:#1E3D25;
+  --bg:#0A0F0D;
+  --bg2:#0F1A14;
+  --bg3:#142018;
+  --border:rgba(201,168,76,0.15);
+  --ink:rgba(255,255,255,0.92);
+  --ink2:rgba(255,255,255,0.55);
+  --ink3:rgba(255,255,255,0.22);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif}
+
+.deck{width:100vw;height:100vh;position:relative}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:72px 100px;
+  opacity:0;pointer-events:none;
+  transition:opacity .55s ease,transform .55s ease;
+  transform:translateX(50px);
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.slide.exit{opacity:0;transform:translateX(-50px)}
+
+/* BG */
+.bg-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+.glow{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
+
+/* NAV */
+
+.arrow{
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(10,15,13,0.8);border:1px solid var(--border);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:100;font-size:20px;line-height:1;
+  backdrop-filter:blur(12px);transition:all .25s;user-select:none;
+}
+.arrow:hover{background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.4)}
+.arrow-left{left:24px}
+.arrow-right{right:24px}
+
+/* HINT */
+.hint{position:fixed;top:28px;right:36px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:1px}
+
+/* BRAND */
+.brand{position:fixed;top:28px;left:36px;display:flex;align-items:center;gap:10px;z-index:100}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.brand-name{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TYPOGRAPHY */
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--gold)}
+
+.display{font-family:'Syne',sans-serif;font-weight:800;line-height:1;letter-spacing:-2px;margin-bottom:24px}
+.display .w1{display:block;color:var(--ink)}
+.display .w2{display:block;background:linear-gradient(90deg,var(--gold),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.display .w3{display:block;color:var(--ink2);font-weight:700}
+
+.lead{font-size:18px;color:var(--ink2);line-height:1.8;max-width:640px;font-weight:300;margin-bottom:36px}
+.lead strong{color:var(--ink);font-weight:500}
+
+/* SECTION */
+.sec-head{margin-bottom:36px}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:16px}
+.sec-title{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,46px);font-weight:800;line-height:1.1;margin-bottom:16px}
+.sec-title em{color:var(--green);font-style:normal}
+.sec-title .gold{color:var(--gold)}
+.sec-body{font-size:16px;color:var(--ink2);line-height:1.8;max-width:700px;font-weight:300}
+.sec-body strong{color:var(--ink);font-weight:500}
+
+/* GRID LAYOUTS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+/* CARD */
+.card{
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--border);border-radius:16px;padding:28px;
+  position:relative;overflow:hidden;
+}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--gold),transparent)}
+.card-icon{font-size:28px;margin-bottom:14px}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px}
+.card-body{font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* LIST ITEMS */
+.item-list{display:flex;flex-direction:column;gap:14px}
+.item{display:flex;gap:16px;align-items:flex-start;padding:16px 20px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px}
+.item-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.item-title{font-size:14px;font-weight:600;margin-bottom:3px}
+.item-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* HIGHLIGHT */
+.hl{
+  background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(106,191,30,0.06));
+  border:1px solid rgba(201,168,76,0.2);border-radius:16px;padding:28px 32px;
+}
+.hl p{font-size:15px;color:var(--ink2);line-height:1.8;font-weight:300}
+.hl strong{color:var(--gold);font-weight:500}
+.hl em{color:var(--green);font-style:normal}
+
+/* QUOTE */
+.big-q{
+  font-family:'Syne',sans-serif;font-size:clamp(24px,3.2vw,40px);font-weight:700;
+  line-height:1.3;max-width:820px;margin:0 auto;text-align:center;
+}
+.big-q em{background:linear-gradient(90deg,var(--gold),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal}
+
+/* STAT ROW */
+.stat-row{display:flex;gap:48px;margin-top:8px;flex-wrap:wrap}
+.sv{font-family:'Syne',sans-serif;font-size:clamp(36px,4vw,54px);font-weight:800;color:var(--gold);line-height:1}
+.sl{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+
+/* TIMELINE */
+.tline{position:relative;display:flex;flex-direction:column;gap:0;padding-left:48px}
+.tline::before{content:'';position:absolute;left:16px;top:20px;bottom:20px;width:1px;background:linear-gradient(to bottom,var(--gold),rgba(106,191,30,0.3))}
+.titem{padding:14px 0;position:relative}
+.titem::before{content:'';position:absolute;left:-36px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--gold)}
+.tphase{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+.ttitle{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px}
+.tdesc{font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* TAGS */
+.tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.tag{padding:7px 16px;border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--ink2);font-family:'JetBrains Mono',monospace}
+.tag.gold{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+.tag.green{border-color:rgba(106,191,30,0.4);color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="brand"><div class="brand-dot"></div><span class="brand-name">Yofren Master Pet Grooming</span></div>
+<div class="hint">← → NAVEGAR</div>
+
+<div class="deck">
+
+<!-- ══ SLIDE 1 — PORTADA ══ -->
+<div class="slide active" id="s1">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(106,191,30,0.09);top:-80px;left:-120px"></div>
+  <div class="glow" style="width:350px;height:350px;background:rgba(201,168,76,0.09);bottom:-60px;right:-80px"></div>
+  <div class="eyebrow">Yofren Master Pet Grooming INC · Miami, FL</div>
+  <h1 class="display" style="font-size:clamp(52px,7.5vw,100px)">
+    <span class="w1">Ya no somos</span>
+    <span class="w2">una compañía.</span>
+    <span class="w3">Ahora pensamos<br>como empresa.</span>
+  </h1>
+  <div class="tags">
+    <span class="tag">NexCore Studio LLC</span>
+    <span class="tag gold">Fleet OS · En producción</span>
+    <span class="tag green">Una nueva era</span>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2 — EL PUNTO DE PARTIDA ══ -->
+<div class="slide" id="s2">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(201,168,76,0.07);top:50%;right:-180px;transform:translateY(-50%)"></div>
+  <div class="two-col">
+    <div>
+      <div class="sec-label">El punto de partida</div>
+      <div class="sec-title">Lo que nos trajo <em>hasta aquí</em></div>
+      <p class="sec-body">
+        Yofren Master Pet Grooming construyó algo real con trabajo duro, calidad de servicio y el mejor equipo de groomers en Miami-Dade. Eso no se discute.<br><br>
+        Hoy, con <strong>7 vans en la calle, más de 8,600 clientes</strong> y un equipo comprometido, somos una operación sólida que ya le hace frente a cualquier competencia local.
+      </p>
+    </div>
+    <div class="hl">
+      <p>Pero hay algo que nos distingue de otras empresas de grooming en Miami:<br><br>
+      <strong>No nos conformamos con ser buenos.</strong><br><br>
+      Queremos <em>ser únicos</em>. Queremos <em>despegar</em>. Queremos construir algo que en 5 años sea una referencia en la industria.<br><br>
+      Y eso requiere pensar diferente — actuar diferente — <strong>hoy.</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 3 — EL PROBLEMA REAL ══ -->
+<div class="slide" id="s3">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:400px;height:400px;background:rgba(106,191,30,0.07);bottom:-100px;left:-100px"></div>
+  <div class="sec-head">
+    <div class="sec-label">La realidad</div>
+    <div class="sec-title">Crecer sin sistemas es <span class="gold">crecer sobre arena</span></div>
+    <p class="sec-body">Las empresas de grooming que hoy compiten con nosotros operan igual que hace 10 años — por teléfono, con papel, con información en la cabeza de una sola persona. Eso tiene un techo.</p>
+  </div>
+  <div class="three-col">
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <div class="card-title">El conocimiento no escala</div>
+      <div class="card-body">Lo que sabe un groomer sobre su cliente se va con él. No queda en ningún sistema. Cada nueva persona empieza desde cero.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏱️</div>
+      <div class="card-title">El tiempo se desperdicia</div>
+      <div class="card-body">Rutas sin optimizar, confirmaciones manuales, clientes que no regresan porque nadie los siguió. Cada hora perdida es dinero que no entra.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📵</div>
+      <div class="card-title">La comunicación se dispersa</div>
+      <div class="card-body">Mensajes en teléfonos personales, sin registro, sin historial. Si se pierde el teléfono, se pierde el cliente.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4 — LA DECISIÓN ══ -->
+<div class="slide" id="s4">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:600px;height:600px;background:rgba(201,168,76,0.08);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <div style="max-width:800px;margin:0 auto;text-align:center">
+    <div class="eyebrow" style="justify-content:center">La decisión</div>
+    <div class="big-q" style="margin-bottom:36px">
+      "Decidimos invertir en construir la infraestructura que nos va a llevar al siguiente nivel — <em>antes de necesitarla</em>, no después."
+    </div>
+    <p style="font-size:16px;color:var(--ink2);line-height:1.8;font-weight:300;max-width:620px;margin:0 auto">
+      Eso es exactamente lo que hacen las empresas que se convierten en líderes de su industria. No reaccionan — <strong style="color:var(--ink)">anticipan</strong>. No improvisan — <strong style="color:var(--ink)">construyen</strong>.
+    </p>
+    <div class="stat-row" style="justify-content:center;margin-top:48px">
+      <div style="text-align:center"><div class="sv">Fleet OS</div><div class="sl">Sistema propio</div></div>
+      <div style="text-align:center"><div class="sv">Call Center</div><div class="sl">Dedicado</div></div>
+      <div style="text-align:center"><div class="sv">IA</div><div class="sl">Integrada</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 5 — QUÉ ES FLEET OS ══ -->
+<div class="slide" id="s5">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:450px;height:450px;background:rgba(106,191,30,0.07);top:-80px;right:-100px"></div>
+  <div class="sec-head">
+    <div class="sec-label">La herramienta</div>
+    <div class="sec-title">Fleet OS — el sistema nervioso <em>de la empresa</em></div>
+    <p class="sec-body">No es un software genérico comprado en internet. Fue diseñado y construido específicamente para <strong>Yofren Master Pet Grooming</strong>, con nuestra operación, nuestros clientes y nuestros groomers en mente.</p>
+  </div>
+  <div class="three-col">
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <div class="card-title">Memoria institucional</div>
+      <div class="card-body">Cada cliente, cada mascota, cada conversación — registrada y disponible. El conocimiento ya no vive en la cabeza de una persona.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <div class="card-title">Agenda inteligente</div>
+      <div class="card-body">El sistema anticipa cuándo va a necesitar servicio cada mascota y llena la agenda antes de que el cliente llame.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Comunicación unificada</div>
+      <div class="card-body">WhatsApp, mensajes, seguimiento — todo en un solo lugar, manejado por un equipo dedicado exclusivamente a esto.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">Rutas optimizadas</div>
+      <div class="card-body">Algoritmos que construyen la ruta perfecta cada día. Menos kilómetros, más citas, más tiempo productivo.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Control total</div>
+      <div class="card-body">Métricas en tiempo real de ingresos, retención, rendimiento por van y por zona. Decisiones basadas en datos, no en suposiciones.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <div class="card-title">App del groomer</div>
+      <div class="card-body">Próximamente: tu herramienta en el van. Perfil del cliente, historial de la mascota, cobro — todo en tu teléfono.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 6 — LO QUE CAMBIA PARA EL GROOMER ══ -->
+<div class="slide" id="s6">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(201,168,76,0.07);bottom:-120px;right:-120px"></div>
+  <div class="two-col">
+    <div>
+      <div class="sec-label">Para ti</div>
+      <div class="sec-title">Lo que este sistema <em>cambia</em> en tu día</div>
+      <p class="sec-body" style="margin-bottom:0">Menos caos. Más tiempo en lo que importa. Más información antes de llegar. Más tranquilidad en la operación.</p>
+    </div>
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">📋</div>
+        <div>
+          <div class="item-title">Llegas sabiendo todo</div>
+          <div class="item-desc">Nombre del perro, cómo se porta, qué corte le gusta, quién pagó la última vez — en tu teléfono antes de salir.</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🗓️</div>
+        <div>
+          <div class="item-title">Tu ruta, siempre llena</div>
+          <div class="item-desc">El equipo de operaciones trabaja para que no tengas huecos en tu agenda. Tú no tienes que buscar clientes.</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">💰</div>
+        <div>
+          <div class="item-title">Transparencia total en tu pago</div>
+          <div class="item-desc">Ves en tiempo real cuánto hiciste hoy, esta semana, este mes. Sin sorpresas, sin esperar.</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🛡️</div>
+        <div>
+          <div class="item-title">La empresa cubre lo que no es tuyo</div>
+          <div class="item-desc">Mantenimiento, marketing, administración, inflación — todo corre por cuenta de la empresa. Tú produces.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 7 — EL EQUIPO CRECE ══ -->
+<div class="slide" id="s7">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(106,191,30,0.07);top:-80px;left:-100px"></div>
+  <div class="two-col">
+    <div>
+      <div class="sec-label">El equipo crece</div>
+      <div class="sec-title">Un call center dedicado <em>trabajando para ti</em></div>
+      <p class="sec-body">
+        Mientras tú estás en el van haciendo tu trabajo, hay un equipo dedicado manejando todo lo que te distrae: confirmaciones, WhatsApp, seguimiento de clientes, agenda del día siguiente.
+      </p>
+      <p class="sec-body" style="margin-top:16px">
+        <strong>Su única misión: que tu ruta esté siempre ocupada.</strong>
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="hl">
+        <p>
+          <strong>El esfuerzo es real.</strong><br><br>
+          Construir este sistema requirió inversión, tiempo, tecnología y visión de largo plazo. No se hace esto cuando solo piensas en el mes que viene.<br><br>
+          Se hace cuando quieres <em>construir una empresa que dure.</em>
+        </p>
+      </div>
+      <div class="card" style="text-align:center;padding:20px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--ink3);margin-bottom:8px">OPERATIVO HOY</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--green)">Call Center Dedicado</div>
+        <div style="font-size:13px;color:var(--ink2);margin-top:4px">Equipo dedicado · Soporte continuo</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 8 — EL FUTURO INMEDIATO ══ -->
+<div class="slide" id="s8">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(201,168,76,0.07);top:50%;right:-150px;transform:translateY(-50%)"></div>
+  <div class="sec-head">
+    <div class="sec-label">El camino</div>
+    <div class="sec-title">Lo que viene — <em>pronto</em></div>
+    <p class="sec-body">No es un sueño lejano. Es el siguiente paso de lo que ya está funcionando hoy.</p>
+  </div>
+  <div class="two-col" style="gap:40px">
+    <div class="tline">
+      <div class="titem">
+        <div class="tphase">Próximas semanas</div>
+        <div class="ttitle">WhatsApp integrado al sistema</div>
+        <div class="tdesc">Todo el WhatsApp del negocio en Fleet OS. El equipo de operaciones responde. Los groomers solo hacen su trabajo.</div>
+      </div>
+      <div class="titem">
+        <div class="tphase">Sprint 5</div>
+        <div class="ttitle">App móvil para groomers</div>
+        <div class="tdesc">Tu herramienta en el van. Agenda, perfil de cliente, mascota, cobro — desde tu teléfono.</div>
+      </div>
+      <div class="titem">
+        <div class="tphase">2026</div>
+        <div class="ttitle">Rutas optimizadas por algoritmo</div>
+        <div class="tdesc">El sistema construye la ruta perfecta para cada día. Más citas, menos tiempo muerto.</div>
+      </div>
+    </div>
+    <div class="tline">
+      <div class="titem">
+        <div class="tphase">2026</div>
+        <div class="ttitle">App para clientes</div>
+        <div class="tdesc">El cliente agenda, ve el historial de su mascota y sabe en tiempo real dónde estás tú.</div>
+      </div>
+      <div class="titem">
+        <div class="tphase">2026–2027</div>
+        <div class="ttitle">Certificaciones oficiales</div>
+        <div class="tdesc">La empresa se registra para emitir certificaciones a sus groomers. Tu experiencia aquí vale en papel.</div>
+      </div>
+      <div class="titem">
+        <div class="tphase">Futuro</div>
+        <div class="ttitle">Programa de franquicias</div>
+        <div class="tdesc">Los mejores groomers tendrán la oportunidad de convertirse en socios franquiciados de la marca.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 9 — TU LUGAR EN ESTO ══ -->
+<div class="slide" id="s9">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:500px;height:500px;background:rgba(106,191,30,0.08);bottom:-100px;left:-100px"></div>
+  <div class="sec-head">
+    <div class="sec-label">Tu lugar en esto</div>
+    <div class="sec-title">Lo que construyes <em>siendo parte</em> de esta empresa</div>
+  </div>
+  <div class="three-col">
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <div class="card-title">Un porcentaje que crece</div>
+      <div class="card-body">Del 36% al 45% según tu desempeño. El sistema mide objetivamente — tus resultados hablan por ti.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📜</div>
+      <div class="card-title">Certificación profesional</div>
+      <div class="card-body">Tu experiencia en Yofren va a tener respaldo oficial. Una credencial que vale en cualquier parte.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏪</div>
+      <div class="card-title">Camino al franquiciado</div>
+      <div class="card-body">Los groomers más comprometidos tienen la posibilidad de convertirse en socios de la marca. No empleados — socios.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <div class="card-title">Contrato transparente</div>
+      <div class="card-body">Trimestral, revisable, sin letra pequeña. Los términos se discuten juntos. Esto no es imposición — es alianza.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛣️</div>
+      <div class="card-title">Ruta estable</div>
+      <div class="card-body">La empresa dedica sus recursos a mantener tu ruta ocupada. Menos incertidumbre, más ingresos predecibles.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌱</div>
+      <div class="card-title">Un negocio que crece contigo</div>
+      <div class="card-body">De 7 a 20 vans. De Miami a toda la Florida. Cada van nueva es una oportunidad más para el equipo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 10 — CIERRE ══ -->
+<div class="slide" id="s10">
+  <div class="bg-grid"></div>
+  <div class="glow" style="width:700px;height:700px;background:rgba(106,191,30,0.08);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <div class="glow" style="width:350px;height:350px;background:rgba(201,168,76,0.09);bottom:-80px;right:-80px"></div>
+  <div style="max-width:820px;margin:0 auto;text-align:center">
+    <div class="eyebrow" style="justify-content:center">El mensaje</div>
+    <div class="big-q" style="margin-bottom:36px">
+      "El barco está zarpando hacia aguas más tranquilas, más limpias y <em>más lucrativas.</em>"
+    </div>
+    <p style="font-size:17px;color:var(--ink2);line-height:1.8;font-weight:300;max-width:600px;margin:0 auto 40px">
+      Esta empresa no está esperando el momento perfecto. <strong style="color:var(--ink)">Ya está actuando.</strong> Ya está construyendo. Ya está invirtiendo en el futuro — en el de todos.<br><br>
+      Los invitamos a montarse en el barco. <strong style="color:var(--ink)">No pierdan esta oportunidad.</strong>
+    </p>
+    <div style="display:inline-block;padding:14px 32px;border:1px solid rgba(201,168,76,0.3);border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold)">
+      Yofren Master Pet Grooming INC · Miami, FL · 2026
+    </div>
+    <div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:2px;text-transform:uppercase">Technology by NexCore Studio LLC</div>
+  </div>
+</div>
+
+</div>
+
+<!-- NAV -->
+<div class="arrow arrow-left" onclick="goTo(cur-1)">&#8592;</div>
+<div class="arrow arrow-right" onclick="goTo(cur+1)">&#8594;</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let cur=0;
+
+function goTo(n){
+  const p=slides[cur];
+  p.classList.remove('active');
+  p.classList.add('exit');
+  setTimeout(()=>p.classList.remove('exit'),600);
+  cur=(n+total)%total;
+  slides[cur].classList.add('active');
+
+
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();goTo(cur+1)}
+  if(e.key==='ArrowLeft'){e.preventDefault();goTo(cur-1)}
+  if(e.key==='Escape')goTo(0);
+});
+let tx=0;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50)dx<0?goTo(cur+1):goTo(cur-1);
+});
+</script>
+</body>
+</html>
